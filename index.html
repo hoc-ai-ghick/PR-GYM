@@ -1,97 +1,185 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gym PR Tracker</title>
-    <!-- Tailwind CSS para diseño minimalista y profesional -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gym Tracker Pro</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Configuración PWA básica -->
-    <meta name="theme-color" content="#111827">
-    <link rel="manifest"
-        href="data:application/manifest+json,{'name':'Gym Tracker','short_name':'Gym','display':'standalone'}">
+    <!-- Google Fonts para estilo deportivo -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="data:application/manifest+json,{'name':'Gym Tracker','short_name':'Gym','display':'standalone','background_color':'#000000','theme_color':'#dc2626'}">
+
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #050505;
+            /* Imagen de fondo oscura tipo gym. Puedes cambiar la URL por tu imagen de Baki */
+            background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.95)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            min-height: 100vh;
+        }
+
+        /* Efecto Cristal (Glassmorphism) basado en tu imagen */
+        .glass-panel {
+            background: rgba(30, 30, 30, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Botones de grupos musculares */
+        .group-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .group-btn:active {
+            transform: scale(0.95);
+            background: rgba(220, 38, 38, 0.3); /* Toque rojo al presionar */
+        }
+
+        /* Ocultar scrollbar pero permitir scroll */
+        ::-webkit-scrollbar {
+            width: 0px;
+        }
+    </style>
 </head>
+<body class="antialiased overflow-x-hidden">
 
-<body class="bg-gray-50 text-gray-900 font-sans antialiased">
-
-    <div class="max-w-md mx-auto bg-white min-h-screen shadow-lg">
+    <!-- VISTA PRINCIPAL (Menú y Calendario) -->
+    <div id="main-view" class="max-w-md mx-auto p-6 flex flex-col min-h-screen">
+        
         <!-- Header -->
-        <header class="bg-gray-900 text-white p-6 rounded-b-3xl shadow-md">
-            <h1 class="text-2xl font-bold tracking-tight">Gym Tracker</h1>
-            <p class="text-sm text-gray-400 mt-1">Registra y supera tus límites</p>
+        <header class="mb-8 text-center pt-4">
+            <h1 class="text-3xl font-extrabold tracking-widest text-white uppercase">Gym <span class="text-red-600">Tracker</span></h1>
         </header>
 
-        <main class="p-6 space-y-8">
-            <!-- Sección de Récords Personales (PRs) -->
-            <section>
-                <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                    <svg class="w-5 h-5 mr-2 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
-                        </path>
-                    </svg>
-                    Tus Mejores PRs
-                </h2>
-                <div id="pr-container" class="grid gap-3">
-                    <!-- Los PRs se cargarán aquí con JS -->
+        <!-- Cuadrícula de 4 Grupos -->
+        <div class="grid grid-cols-2 gap-4 mb-10">
+            <button onclick="openGroup('BRAZOS')" class="group-btn glass-panel h-32 rounded-3xl flex items-center justify-center text-xl font-bold tracking-wider">BRAZOS</button>
+            <button onclick="openGroup('ESPALDA')" class="group-btn glass-panel h-32 rounded-3xl flex items-center justify-center text-xl font-bold tracking-wider">ESPALDA</button>
+            <button onclick="openGroup('PECHO')" class="group-btn glass-panel h-32 rounded-3xl flex items-center justify-center text-xl font-bold tracking-wider">PECHO</button>
+            <button onclick="openGroup('PIERNAS')" class="group-btn glass-panel h-32 rounded-3xl flex items-center justify-center text-xl font-bold tracking-wider">PIERNAS</button>
+        </div>
+
+        <!-- Calendario -->
+        <div class="relative glass-panel rounded-3xl p-6 mt-auto mb-6">
+            <!-- Etiqueta superior del contador -->
+            <div id="workout-count" class="absolute -top-4 right-6 bg-red-600 text-white text-lg font-bold px-4 py-1.5 rounded-xl shadow-[0_0_15px_rgba(220,38,38,0.5)]">
+                0/30
+            </div>
+            
+            <h3 class="text-2xl font-extrabold mb-4 uppercase" id="month-name">MES</h3>
+            
+            <!-- Días de la semana -->
+            <div class="grid grid-cols-7 gap-1 text-center text-sm font-bold text-gray-300 mb-3">
+                <div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div>
+            </div>
+            
+            <!-- Cuadrícula de fechas generada por JS -->
+            <div id="calendar-grid" class="grid grid-cols-7 gap-y-3 gap-x-1 text-center text-base font-semibold">
+                <!-- Se llena con Javascript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- VISTA DEL GRUPO (Formulario y PRs) -->
+    <div id="group-view" class="hidden max-w-md mx-auto p-6 min-h-screen flex flex-col">
+        
+        <div class="flex items-center justify-between mb-8 pt-4">
+            <button onclick="closeGroup()" class="text-red-500 font-bold flex items-center text-lg hover:text-red-400 transition-colors">
+                <svg class="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                Volver
+            </button>
+            <h2 id="group-title" class="text-2xl font-extrabold tracking-widest text-white uppercase">GRUPO</h2>
+        </div>
+
+        <!-- Formulario de Registro -->
+        <section class="glass-panel rounded-3xl p-6 mb-8">
+            <h3 class="text-sm text-gray-300 font-bold uppercase tracking-wider mb-4">Registrar Serie</h3>
+            <form id="workout-form" class="space-y-4">
+                <div>
+                    <input type="text" id="exercise" required placeholder="Nombre del Ejercicio" 
+                           class="w-full px-4 py-3 bg-black/50 border border-white/20 text-white rounded-xl focus:outline-none focus:border-red-500 transition-colors placeholder-gray-500">
                 </div>
-            </section>
-
-            <hr class="border-gray-100">
-
-            <!-- Formulario de Registro -->
-            <section>
-                <h2 class="text-lg font-semibold text-gray-800 mb-4">Nuevo Registro</h2>
-                <form id="workout-form" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Ejercicio</label>
-                        <input type="text" id="exercise" required placeholder="Ej. Curl de Bíceps"
-                            class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 transition-all">
+                        <input type="number" id="weight" step="0.5" required placeholder="Peso (kg)" 
+                               class="w-full px-4 py-3 bg-black/50 border border-white/20 text-white rounded-xl focus:outline-none focus:border-red-500 transition-colors placeholder-gray-500 text-center">
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Peso (kg)</label>
-                            <input type="number" id="weight" step="0.5" required placeholder="0.0"
-                                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 transition-all">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Repeticiones</label>
-                            <input type="number" id="reps" required placeholder="0"
-                                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-gray-900 transition-all">
-                        </div>
+                    <div>
+                        <input type="number" id="reps" required placeholder="Reps" 
+                               class="w-full px-4 py-3 bg-black/50 border border-white/20 text-white rounded-xl focus:outline-none focus:border-red-500 transition-colors placeholder-gray-500 text-center">
                     </div>
-                    <button type="submit"
-                        class="w-full bg-gray-900 text-white font-medium py-3 rounded-xl hover:bg-gray-800 transition-colors shadow-md">
-                        Guardar Serie
-                    </button>
-                </form>
-            </section>
-        </main>
+                </div>
+                <button type="submit" class="w-full bg-red-600 text-white font-bold text-lg tracking-wider py-3 rounded-xl shadow-[0_0_15px_rgba(220,38,38,0.4)] hover:bg-red-700 active:scale-95 transition-all">
+                    GUARDAR
+                </button>
+            </form>
+        </section>
+
+        <!-- Lista de PRs del Grupo -->
+        <section class="flex-grow">
+            <h3 class="text-sm text-red-500 font-bold uppercase tracking-wider mb-4 flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                Tus Récords (PRs)
+            </h3>
+            <div id="pr-container" class="space-y-3 pb-8">
+                <!-- Se llena con JS -->
+            </div>
+        </section>
     </div>
 
     <script>
-        // Cargar datos locales o inicializar array vacío
-        let workouts = JSON.parse(localStorage.getItem('gymWorkouts')) || [];
+        // BD Local
+        let workouts = JSON.parse(localStorage.getItem('gymWorkoutsPro')) || [];
+        let currentGroup = '';
 
-        // Función principal para calcular y renderizar PRs
+        // Función para cambiar de pantalla
+        function openGroup(groupName) {
+            currentGroup = groupName;
+            document.getElementById('group-title').innerText = groupName;
+            
+            document.getElementById('main-view').classList.add('hidden');
+            document.getElementById('group-view').classList.remove('hidden');
+            
+            renderPRs();
+        }
+
+        function closeGroup() {
+            document.getElementById('group-view').classList.add('hidden');
+            document.getElementById('main-view').classList.remove('hidden');
+            currentGroup = '';
+            
+            // Actualizar calendario por si se registró algo nuevo
+            renderCalendar();
+        }
+
+        // Renderizar Récords (Solo del grupo actual)
         function renderPRs() {
             const prContainer = document.getElementById('pr-container');
             prContainer.innerHTML = '';
 
-            if (workouts.length === 0) {
-                prContainer.innerHTML = '<p class="text-sm text-gray-400 italic">Aún no hay registros. ¡Empieza a entrenar!</p>';
+            // Filtrar workouts del grupo actual
+            const groupWorkouts = workouts.filter(w => w.group === currentGroup);
+
+            if (groupWorkouts.length === 0) {
+                prContainer.innerHTML = '<p class="text-sm text-gray-400 italic text-center mt-6">Sin registros. ¡Hora de entrenar!</p>';
                 return;
             }
 
-            // Lógica para obtener el PR por ejercicio
+            // Encontrar el PR
             const prs = {};
-            workouts.forEach(workout => {
+            groupWorkouts.forEach(workout => {
                 const name = workout.exercise.trim().toLowerCase();
                 if (!prs[name]) {
                     prs[name] = workout;
                 } else {
-                    // Prevalece el peso máximo. Si es el mismo peso, prevalecen las repeticiones
                     if (workout.weight > prs[name].weight) {
                         prs[name] = workout;
                     } else if (workout.weight === prs[name].weight && workout.reps > prs[name].reps) {
@@ -100,49 +188,119 @@
                 }
             });
 
-            // Renderizar los PRs en la interfaz
+            // Dibujar PRs
             Object.values(prs).forEach(pr => {
                 const card = document.createElement('div');
-                card.className = 'bg-white border border-gray-100 p-4 rounded-xl shadow-sm flex justify-between items-center';
-
-                // Capitalizar primera letra del ejercicio
-                const exerciseName = pr.exercise.charAt(0).toUpperCase() + pr.exercise.slice(1);
-
+                card.className = 'glass-panel p-4 rounded-2xl flex justify-between items-center';
+                const exerciseName = pr.exercise.toUpperCase();
+                
                 card.innerHTML = `
                     <div>
-                        <p class="font-medium text-gray-800">${exerciseName}</p>
-                        <p class="text-xs text-gray-400">${pr.date}</p>
+                        <p class="font-bold text-white tracking-wide">${exerciseName}</p>
+                        <p class="text-xs text-gray-400 mt-1">${pr.displayDate}</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-xl font-bold text-gray-900">${pr.weight} <span class="text-sm font-normal text-gray-500">kg</span></p>
-                        <p class="text-sm font-medium text-gray-500">${pr.reps} reps</p>
+                        <p class="text-2xl font-extrabold text-white">${pr.weight}<span class="text-sm font-medium text-gray-400 ml-1">kg</span></p>
+                        <p class="text-sm font-bold text-red-500">${pr.reps} reps</p>
                     </div>
                 `;
                 prContainer.appendChild(card);
             });
         }
 
-        // Manejar el envío del formulario
-        document.getElementById('workout-form').addEventListener('submit', function (e) {
+        // Guardar nueva serie
+        document.getElementById('workout-form').addEventListener('submit', function(e) {
             e.preventDefault();
-
+            
+            // Usamos formato ISO (YYYY-MM-DD) para lógica del calendario y fecha local para mostrar
+            const dateObj = new Date();
+            // Corrección de zona horaria para formato YYYY-MM-DD
+            const tzOffset = (new Date()).getTimezoneOffset() * 60000;
+            const dateIso = (new Date(Date.now() - tzOffset)).toISOString().split('T')[0];
+            
             const newWorkout = {
+                id: Date.now(),
+                group: currentGroup,
                 exercise: document.getElementById('exercise').value,
                 weight: parseFloat(document.getElementById('weight').value),
                 reps: parseInt(document.getElementById('reps').value),
-                date: new Date().toLocaleDateString('es-PE') // Formato de fecha
+                dateIso: dateIso,
+                displayDate: dateObj.toLocaleDateString('es-PE')
             };
 
             workouts.push(newWorkout);
-            localStorage.setItem('gymWorkouts', JSON.stringify(workouts));
-
+            localStorage.setItem('gymWorkoutsPro', JSON.stringify(workouts));
+            
             this.reset();
             renderPRs();
+            
+            // Feedback visual sutil (Opcional)
+            const btn = this.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = "¡GUARDADO!";
+            btn.classList.add('bg-green-600');
+            setTimeout(() => { 
+                btn.innerText = originalText; 
+                btn.classList.remove('bg-green-600');
+            }, 1000);
         });
 
-        // Cargar los PRs al iniciar
-        renderPRs();
+        // Lógica del Calendario
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+            
+            const hoy = new Date();
+            const year = hoy.getFullYear();
+            const month = hoy.getMonth();
+            
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            // Índice del primer día (0 = Dom, 1 = Lun... Ajustamos para que Lun sea 0)
+            let firstDayIndex = new Date(year, month, 1).getDay();
+            firstDayIndex = firstDayIndex === 0 ? 6 : firstDayIndex - 1; 
+            
+            // Nombres meses
+            const monthNames = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
+            document.getElementById('month-name').innerText = monthNames[month];
+            
+            // Buscar días entrenados este mes
+            const workoutsThisMonth = workouts.filter(w => {
+                if(!w.dateIso) return false; // Por seguridad
+                const [wYear, wMonth, wDay] = w.dateIso.split('-');
+                return parseInt(wYear) === year && (parseInt(wMonth) - 1) === month;
+            });
+            
+            // Set para evitar días duplicados (ej: si entrenó 2 ejercicios el mismo día)
+            const activeDays = new Set(workoutsThisMonth.map(w => parseInt(w.dateIso.split('-')[2])));
+            
+            // Actualizar etiqueta del contador X/Y
+            document.getElementById('workout-count').innerText = `${activeDays.size}/${daysInMonth}`;
+            
+            // Rellenar espacios vacíos del inicio del mes
+            for(let i = 0; i < firstDayIndex; i++) {
+                grid.innerHTML += `<div></div>`;
+            }
+            
+            // Dibujar los días del mes
+            for(let d = 1; d <= daysInMonth; d++) {
+                const isActive = activeDays.has(d);
+                
+                // Clases CSS dinámicas. Si está activo se pone fondo rojo y sombra brillante
+                const circleClasses = isActive 
+                    ? "w-8 h-8 mx-auto flex items-center justify-center bg-red-600 text-white rounded-full shadow-[0_0_10px_rgba(220,38,38,0.8)]" 
+                    : "w-8 h-8 mx-auto flex items-center justify-center text-gray-500 bg-white/5 rounded-full border border-white/5";
+                
+                grid.innerHTML += `
+                    <div>
+                        <div class="${circleClasses}">${d}</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Inicializar app
+        renderCalendar();
     </script>
 </body>
-
 </html>
