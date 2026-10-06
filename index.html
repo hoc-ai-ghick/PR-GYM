@@ -3,21 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- Meta tags obligatorios para Pantalla Completa en iOS y Android -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    
     <title>Gym Tracker Pro</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts para estilo deportivo -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     
-    <meta name="theme-color" content="#000000">
-    <link rel="manifest" href="data:application/manifest+json,{'name':'Gym Tracker','short_name':'Gym','display':'standalone','background_color':'#000000','theme_color':'#dc2626'}">
+    <!-- Enlace al archivo que convierte la web en App -->
+    <link rel="manifest" href="manifest.json">
 
     <style>
         body {
             font-family: 'Montserrat', sans-serif;
             background-color: #050505;
-            /* Imagen de fondo oscura tipo gym. Puedes cambiar la URL por tu imagen de Baki */
-            background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.95)), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1470&auto=format&fit=crop');
+            /* AQUÍ ESTÁ LA IMAGEN LOCAL. Debe llamarse exactamente así en tu GitHub */
+            background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.95)), url('baki-fondo.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -25,7 +29,6 @@
             min-height: 100vh;
         }
 
-        /* Efecto Cristal (Glassmorphism) basado en tu imagen */
         .glass-panel {
             background: rgba(30, 30, 30, 0.4);
             backdrop-filter: blur(12px);
@@ -34,16 +37,14 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
-        /* Botones de grupos musculares */
         .group-btn {
             transition: all 0.2s ease-in-out;
         }
         .group-btn:active {
             transform: scale(0.95);
-            background: rgba(220, 38, 38, 0.3); /* Toque rojo al presionar */
+            background: rgba(220, 38, 38, 0.3);
         }
 
-        /* Ocultar scrollbar pero permitir scroll */
         ::-webkit-scrollbar {
             width: 0px;
         }
@@ -54,12 +55,10 @@
     <!-- VISTA PRINCIPAL (Menú y Calendario) -->
     <div id="main-view" class="max-w-md mx-auto p-6 flex flex-col min-h-screen">
         
-        <!-- Header -->
         <header class="mb-8 text-center pt-4">
             <h1 class="text-3xl font-extrabold tracking-widest text-white uppercase">Gym <span class="text-red-600">Tracker</span></h1>
         </header>
 
-        <!-- Cuadrícula de 4 Grupos -->
         <div class="grid grid-cols-2 gap-4 mb-10">
             <button onclick="openGroup('BRAZOS')" class="group-btn glass-panel h-32 rounded-3xl flex items-center justify-center text-xl font-bold tracking-wider">BRAZOS</button>
             <button onclick="openGroup('ESPALDA')" class="group-btn glass-panel h-32 rounded-3xl flex items-center justify-center text-xl font-bold tracking-wider">ESPALDA</button>
@@ -69,26 +68,23 @@
 
         <!-- Calendario -->
         <div class="relative glass-panel rounded-3xl p-6 mt-auto mb-6">
-            <!-- Etiqueta superior del contador -->
             <div id="workout-count" class="absolute -top-4 right-6 bg-red-600 text-white text-lg font-bold px-4 py-1.5 rounded-xl shadow-[0_0_15px_rgba(220,38,38,0.5)]">
                 0/30
             </div>
             
             <h3 class="text-2xl font-extrabold mb-4 uppercase" id="month-name">MES</h3>
             
-            <!-- Días de la semana -->
             <div class="grid grid-cols-7 gap-1 text-center text-sm font-bold text-gray-300 mb-3">
                 <div>L</div><div>M</div><div>M</div><div>J</div><div>V</div><div>S</div><div>D</div>
             </div>
             
-            <!-- Cuadrícula de fechas generada por JS -->
             <div id="calendar-grid" class="grid grid-cols-7 gap-y-3 gap-x-1 text-center text-base font-semibold">
-                <!-- Se llena con Javascript -->
+                <!-- Generado por JS -->
             </div>
         </div>
     </div>
 
-    <!-- VISTA DEL GRUPO (Formulario y PRs) -->
+    <!-- VISTA DEL GRUPO -->
     <div id="group-view" class="hidden max-w-md mx-auto p-6 min-h-screen flex flex-col">
         
         <div class="flex items-center justify-between mb-8 pt-4">
@@ -99,7 +95,6 @@
             <h2 id="group-title" class="text-2xl font-extrabold tracking-widest text-white uppercase">GRUPO</h2>
         </div>
 
-        <!-- Formulario de Registro -->
         <section class="glass-panel rounded-3xl p-6 mb-8">
             <h3 class="text-sm text-gray-300 font-bold uppercase tracking-wider mb-4">Registrar Serie</h3>
             <form id="workout-form" class="space-y-4">
@@ -123,31 +118,25 @@
             </form>
         </section>
 
-        <!-- Lista de PRs del Grupo -->
         <section class="flex-grow">
             <h3 class="text-sm text-red-500 font-bold uppercase tracking-wider mb-4 flex items-center">
-                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
                 Tus Récords (PRs)
             </h3>
             <div id="pr-container" class="space-y-3 pb-8">
-                <!-- Se llena con JS -->
+                <!-- Generado por JS -->
             </div>
         </section>
     </div>
 
     <script>
-        // BD Local
         let workouts = JSON.parse(localStorage.getItem('gymWorkoutsPro')) || [];
         let currentGroup = '';
 
-        // Función para cambiar de pantalla
         function openGroup(groupName) {
             currentGroup = groupName;
             document.getElementById('group-title').innerText = groupName;
-            
             document.getElementById('main-view').classList.add('hidden');
             document.getElementById('group-view').classList.remove('hidden');
-            
             renderPRs();
         }
 
@@ -155,25 +144,19 @@
             document.getElementById('group-view').classList.add('hidden');
             document.getElementById('main-view').classList.remove('hidden');
             currentGroup = '';
-            
-            // Actualizar calendario por si se registró algo nuevo
             renderCalendar();
         }
 
-        // Renderizar Récords (Solo del grupo actual)
         function renderPRs() {
             const prContainer = document.getElementById('pr-container');
             prContainer.innerHTML = '';
-
-            // Filtrar workouts del grupo actual
             const groupWorkouts = workouts.filter(w => w.group === currentGroup);
 
             if (groupWorkouts.length === 0) {
-                prContainer.innerHTML = '<p class="text-sm text-gray-400 italic text-center mt-6">Sin registros. ¡Hora de entrenar!</p>';
+                prContainer.innerHTML = '<p class="text-sm text-gray-400 italic text-center mt-6">Sin registros.</p>';
                 return;
             }
 
-            // Encontrar el PR
             const prs = {};
             groupWorkouts.forEach(workout => {
                 const name = workout.exercise.trim().toLowerCase();
@@ -188,7 +171,6 @@
                 }
             });
 
-            // Dibujar PRs
             Object.values(prs).forEach(pr => {
                 const card = document.createElement('div');
                 card.className = 'glass-panel p-4 rounded-2xl flex justify-between items-center';
@@ -208,17 +190,13 @@
             });
         }
 
-        // Guardar nueva serie
         document.getElementById('workout-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            
-            // Usamos formato ISO (YYYY-MM-DD) para lógica del calendario y fecha local para mostrar
             const dateObj = new Date();
-            // Corrección de zona horaria para formato YYYY-MM-DD
             const tzOffset = (new Date()).getTimezoneOffset() * 60000;
             const dateIso = (new Date(Date.now() - tzOffset)).toISOString().split('T')[0];
             
-            const newWorkout = {
+            workouts.push({
                 id: Date.now(),
                 group: currentGroup,
                 exercise: document.getElementById('exercise').value,
@@ -226,26 +204,19 @@
                 reps: parseInt(document.getElementById('reps').value),
                 dateIso: dateIso,
                 displayDate: dateObj.toLocaleDateString('es-PE')
-            };
+            });
 
-            workouts.push(newWorkout);
             localStorage.setItem('gymWorkoutsPro', JSON.stringify(workouts));
-            
             this.reset();
             renderPRs();
             
-            // Feedback visual sutil (Opcional)
             const btn = this.querySelector('button');
             const originalText = btn.innerText;
             btn.innerText = "¡GUARDADO!";
             btn.classList.add('bg-green-600');
-            setTimeout(() => { 
-                btn.innerText = originalText; 
-                btn.classList.remove('bg-green-600');
-            }, 1000);
+            setTimeout(() => { btn.innerText = originalText; btn.classList.remove('bg-green-600'); }, 1000);
         });
 
-        // Lógica del Calendario
         function renderCalendar() {
             const grid = document.getElementById('calendar-grid');
             grid.innerHTML = '';
@@ -253,53 +224,34 @@
             const hoy = new Date();
             const year = hoy.getFullYear();
             const month = hoy.getMonth();
-            
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             
-            // Índice del primer día (0 = Dom, 1 = Lun... Ajustamos para que Lun sea 0)
             let firstDayIndex = new Date(year, month, 1).getDay();
             firstDayIndex = firstDayIndex === 0 ? 6 : firstDayIndex - 1; 
             
-            // Nombres meses
             const monthNames = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
             document.getElementById('month-name').innerText = monthNames[month];
             
-            // Buscar días entrenados este mes
             const workoutsThisMonth = workouts.filter(w => {
-                if(!w.dateIso) return false; // Por seguridad
+                if(!w.dateIso) return false;
                 const [wYear, wMonth, wDay] = w.dateIso.split('-');
                 return parseInt(wYear) === year && (parseInt(wMonth) - 1) === month;
             });
             
-            // Set para evitar días duplicados (ej: si entrenó 2 ejercicios el mismo día)
             const activeDays = new Set(workoutsThisMonth.map(w => parseInt(w.dateIso.split('-')[2])));
-            
-            // Actualizar etiqueta del contador X/Y
             document.getElementById('workout-count').innerText = `${activeDays.size}/${daysInMonth}`;
             
-            // Rellenar espacios vacíos del inicio del mes
-            for(let i = 0; i < firstDayIndex; i++) {
-                grid.innerHTML += `<div></div>`;
-            }
+            for(let i = 0; i < firstDayIndex; i++) grid.innerHTML += `<div></div>`;
             
-            // Dibujar los días del mes
             for(let d = 1; d <= daysInMonth; d++) {
                 const isActive = activeDays.has(d);
-                
-                // Clases CSS dinámicas. Si está activo se pone fondo rojo y sombra brillante
                 const circleClasses = isActive 
                     ? "w-8 h-8 mx-auto flex items-center justify-center bg-red-600 text-white rounded-full shadow-[0_0_10px_rgba(220,38,38,0.8)]" 
                     : "w-8 h-8 mx-auto flex items-center justify-center text-gray-500 bg-white/5 rounded-full border border-white/5";
                 
-                grid.innerHTML += `
-                    <div>
-                        <div class="${circleClasses}">${d}</div>
-                    </div>
-                `;
+                grid.innerHTML += `<div><div class="${circleClasses}">${d}</div></div>`;
             }
         }
-
-        // Inicializar app
         renderCalendar();
     </script>
 </body>
